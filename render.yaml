@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: disaster
+    env: python
+    plan: free
+    buildCommand: ""
+    startCommand: "python main.py"
+    envVars:
+      - key: EMAIL
+        sync: false
+      - key: EMAIL_PASSWORD
+        sync: false
