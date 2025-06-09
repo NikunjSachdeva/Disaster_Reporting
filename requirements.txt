@@ -1,0 +1,7 @@
+Flask
+pyrebase4
+geocoder
+flask_sqlalchemy
+firebase_admin
+transformers
+scikit-learn
