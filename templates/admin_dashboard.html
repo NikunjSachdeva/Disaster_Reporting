@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disaster Overview</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .disaster-card {
+            margin: 20px 0;
+        }
+        .disaster-summary {
+            margin-bottom: 20px;
+        }
+        .location-btn {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="my-4">Disaster Overview</h1>
+
+
+        <button onclick="window.location.href='{{ url_for('notifications') }}'" class="btn btn-info update-status-btn" >Notifications & Alerts</button>
+        <!-- Inside your Admin Dashboard HTML -->
+        <a href="{{ url_for('analytics') }}" class="btn btn-info">Analytics and Insights</a>
+        <a href="{{ url_for('map') }}" class="btn btn-info">View Map and Heatmap</a>
+
+        <!-- Disaster Summary Section -->
+        <div class="disaster-summary">
+            <h3>Summary</h3>
+            <p><strong>Total Reports:</strong> <span id="total-reports">0</span></p>
+            <p><strong>Pending Reports:</strong> <span id="pending-reports">0</span></p>
+            <p><strong>Disaster Types:</strong> <span id="disaster-types"></span></p>
+        </div>
+
+        <!-- Disaster List Section -->
+        <h3>Disaster Reports</h3>
+        <div id="disaster-list" class="row"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Function to fetch and display disaster overview
+        async function fetchDisasterOverview() {
+            try {
+                const response = await fetch('/api/disasters');
+                const data = await response.json();
+
+                if (data.error) {
+                    alert('Error fetching disaster data: ' + data.error);
+                    return;
+                }
+
+                // Update the summary section
+                document.getElementById('total-reports').textContent = data.total_reports || 0;
+                document.getElementById('pending-reports').textContent = data.pending_reports || 0;
+
+                // Display disaster types
+                const disasterTypes = data.disaster_types;
+                const disasterTypesList = Object.entries(disasterTypes).map(([type, count]) => {
+                    return `<span>${type}: ${count}</span><br>`;
+                }).join('');
+                document.getElementById('disaster-types').innerHTML = disasterTypesList;
+
+                // Display the disaster reports
+                const disasterListContainer = document.getElementById('disaster-list');
+                disasterListContainer.innerHTML = '';
+
+                data.disasters.forEach(disaster => {
+                    const disasterCard = document.createElement('div');
+                    disasterCard.classList.add('col-md-4');
+                    disasterCard.classList.add('disaster-card');
+
+                    disasterCard.innerHTML = `
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">${disaster.disaster_type || 'Unknown'}</h5>
+                                <p class="card-text"><strong>Status:</strong> ${disaster.status}</p>
+                                <p class="card-text"><strong>Description:</strong> ${disaster.description || 'No description available.'}</p>
+                                <p class="card-text"><strong>Location:</strong> ${disaster.location || 'Not provided'}</p>
+                                <p class="card-text"><strong>Report ID:</strong> ${disaster.id}</p>
+                                <p class="card-text"><strong>Flag:</strong> ${disaster.flag || 'Not Set'}</p>
+
+                                <!-- Go to Location Button -->
+                                <button class="btn btn-primary location-btn" data-loc="${disaster.location || ''}" data-lng="${disaster.longitude || ''}">
+                                    Go to Location
+                                </button>
+
+                                <!-- Verify and Reject Buttons -->
+                                <div class="mt-3">
+                                    <button class="btn btn-success verify-btn" data-id="${disaster.id}">
+                                        Verify
+                                    </button>
+                                    <button class="btn btn-danger reject-btn" data-id="${disaster.id}">
+                                        Reject
+                                    </button>
+                                </div>
+
+                                <!-- Update Status -->
+                                <div class="mt-3">
+                                    <select class="status-select" data-id="${disaster.id}">
+                                        <option value="in-progress" ${disaster.status === 'in-progress' ? 'selected' : ''}>In Progress</option>
+                                        <option value="completed" ${disaster.status === 'completed' ? 'selected' : ''}>Completed</option>
+                                    </select>
+                                    <button class="btn btn-info update-status-btn" data-id="${disaster.id}">Update Status</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    disasterListContainer.appendChild(disasterCard);
+                });
+
+                // Add event listeners for the dynamically created buttons
+                addEventListeners();
+            } catch (error) {
+                console.error('Error fetching disaster data:', error);
+                alert('Failed to load disaster data.');
+            }
+        }
+
+        // Function to add event listeners
+        function addEventListeners() {
+            // Handle Go to Location Button Click
+            document.querySelectorAll('.location-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const loc = button.getAttribute('data-loc');
+                    if (loc) {
+                        const [lat, lng] = loc.split(',');
+                        if (lat && lng) {
+                            window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
+                        } else {
+                            alert('Invalid location data.');
+                        }
+                    } else {
+                        alert('Location data is missing.');
+                    }
+                });
+            });
+
+            // Handle Verify and Reject Buttons Click
+            document.querySelectorAll('.verify-btn').forEach(button => {
+                button.addEventListener('click', async () => {
+                    const reportId = button.getAttribute('data-id');
+                    const response = await fetch(`/api/report/verify/${reportId}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    const result = await response.json();
+                    alert(result.message || result.error);
+                    fetchDisasterOverview(); // Refresh the data
+                });
+            });
+
+            document.querySelectorAll('.reject-btn').forEach(button => {
+                button.addEventListener('click', async () => {
+                    const reportId = button.getAttribute('data-id');
+                    
+                    // Ask for confirmation before deletion
+                    const confirmed = confirm("Are you sure you want to reject and delete this report?");
+                    if (!confirmed) {
+                        return; // Abort if not confirmed
+                    }
+            
+                    // Send the rejection and deletion request with the confirmation flag
+                    const response = await fetch(`/api/report/reject/${reportId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'  // Ensure this header is present
+                        },
+                        body: JSON.stringify({ confirmation: true })  // Send confirmation parameter as JSON
+                    });
+            
+                    const result = await response.json();
+                    alert(result.message || result.error);
+                    fetchDisasterOverview(); // Refresh the data after rejection
+                });
+            });
+            
+
+            // Handle Update Status Button Click
+            document.querySelectorAll('.update-status-btn').forEach(button => {
+                button.addEventListener('click', async () => {
+                    const reportId = button.getAttribute('data-id');
+                    const select = button.previousElementSibling;
+                    const newStatus = select.value;
+                    console.log(`Updating report ${reportId} to status: ${newStatus}`);
+                    const response = await fetch(`/api/report/${reportId}/status`, {
+                        method: 'PUT',
+                        body: JSON.stringify({ status: newStatus }),
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    const result = await response.json();
+                    alert(result.message || result.error);
+                    fetchDisasterOverview(); // Refresh the data
+                });
+            });
+            
+        }
+
+        // Initial load of disaster overview
+        fetchDisasterOverview();
+    </script>
+
+</body>
+</html>
