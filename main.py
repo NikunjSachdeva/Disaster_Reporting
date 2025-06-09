@@ -20,16 +20,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 # Firebase configuration
-firebase_config = {
-    "apiKey": "AIzaSyCLpmzyb-B5UD64D5HzNcuJTbVEb6asLXs",
-    "authDomain": "disaster-reporting-tool-bcb20.firebaseapp.com",
-    "databaseURL": "https://disaster-reporting-tool-bcb20-default-rtdb.firebaseio.com",
-    "projectId": "disaster-reporting-tool-bcb20",
-    "storageBucket": "disaster-reporting-tool-bcb20.firebasestorage.app",
-    "messagingSenderId": "646975858164",
-    "appId": "1:646975858164:web:fc25cbeda8ad1f704585a1"
-}
 
+firebase_config = json.loads(os.getenv("FIREBASE_CONFIG"))
 firebase = pyrebase.initialize_app(firebase_config)
 db = firebase.database()
 storage = firebase.storage()  
@@ -644,8 +636,7 @@ def analytics():
 
 import logging
 import requests
-GEMINI_API_KEY = "AIzaSyB0ZjCATMMJaujXqQVs45AyqTsrE-fWhWs"
-GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={GEMINI_API_KEY}"
+
 logger = logging.getLogger(__name__)
 
 
