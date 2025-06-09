@@ -55,9 +55,7 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 
 
-# Email configuration
-EMAIL = "nikunj.sachdeva12@gmail.com"  
-EMAIL_PASSWORD = "elgy poqi nolw lsnt"  
+
 
 # Global variable to store OTP
 otp_cache = {}
