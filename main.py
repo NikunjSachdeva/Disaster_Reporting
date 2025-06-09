@@ -636,7 +636,7 @@ def analytics():
 
 import logging
 import requests
-
+GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={GEMINI_API_KEY}"
 logger = logging.getLogger(__name__)
 
 
