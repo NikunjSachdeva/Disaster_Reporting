@@ -44,7 +44,8 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 
-
+EMAIL = os.getenv('EMAIL')
+EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
 
 
 
@@ -636,6 +637,7 @@ def analytics():
 
 import logging
 import requests
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={GEMINI_API_KEY}"
 logger = logging.getLogger(__name__)
 
