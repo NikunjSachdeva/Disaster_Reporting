@@ -27,7 +27,13 @@ db = firebase.database()
 storage = firebase.storage()  
 app = Flask(__name__)
 app.secret_key = 'secret_key'  
+EMAIL = os.getenv('EMAIL')
+EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 
+print(f"EMAIL: {EMAIL}")
+print(f"EMAIL_PASSWORD: {EMAIL_PASSWORD}")
+print(f"GEMINI_API_KEY: {GEMINI_API_KEY}")
 
 
 # Firestore collection references
@@ -44,8 +50,7 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 
-EMAIL = os.getenv('EMAIL')
-EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
+
 
 
 
@@ -637,7 +642,6 @@ def analytics():
 
 import logging
 import requests
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={GEMINI_API_KEY}"
 logger = logging.getLogger(__name__)
 
