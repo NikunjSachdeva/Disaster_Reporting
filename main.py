@@ -77,7 +77,7 @@ def register():
 
         # Send OTP via email
         try:
-            with smtplib.SMTP('smtp.gmail.com', 587) as server:
+            with smtplib.SMTP('smtp.gmail.com', 587, timeout = 30) as server:
                 server.starttls()
                 server.login(EMAIL, EMAIL_PASSWORD)
                 message = f"Subject: OTP Verification\n\nYour OTP for registration is: {otp}"
@@ -542,7 +542,7 @@ def update_report_status(report_id):
     
 def send_email(recipient_email, subject, message):
     try:
-        with smtplib.SMTP('smtp.gmail.com', 587) as server:
+        with smtplib.SMTP('smtp.gmail.com', 587, timeout = 30) as server:
             server.starttls()
             server.login(EMAIL, EMAIL_PASSWORD)
             email_message = f"Subject: {subject}\n\n{message}"
