@@ -10,3 +10,7 @@ services:
         sync: false
       - key: EMAIL_PASSWORD
         sync: false
+      - key: FIREBASE_CONFIG
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
