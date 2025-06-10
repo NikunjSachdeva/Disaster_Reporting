@@ -684,7 +684,7 @@ def getgeminiresponse(input_text: str, blog_style: str = 'Disaster Guide') -> st
     
     try:
         # Make the API call
-        response = requests.post(GEMINI_URL, headers=headers, json=data)
+        response = requests.post(GEMINI_URL, headers=headers, json=data, timeout = 30)
         if response.status_code == 200:
             response_data = response.json()
             # Extract text from the first candidate's content
