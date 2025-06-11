@@ -27,9 +27,13 @@ db = firebase.database()
 storage = firebase.storage()  
 app = Flask(__name__)
 app.secret_key = 'secret_key'  
-EMAIL = os.getenv('EMAIL')
-EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+email = os.getenv('EMAIL')
+email_password = os.getenv('EMAIL_PASSWORD')
+api_key = os.getenv('GEMINI_API_KEY')
+
+EMAIL = email
+EMAIL_PASSWORD = email_password
+GEMINI_API_KEY = api_key
 
 print(f"EMAIL: {EMAIL}")
 print(f"EMAIL_PASSWORD: {EMAIL_PASSWORD}")
